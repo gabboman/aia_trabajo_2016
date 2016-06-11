@@ -7,6 +7,12 @@ class MOK:
     '''Modelo oculto de markov'''
     #Metodo útil: dado un diccionario con la estructura (dato1, dato2):probabilidad
     #con entrada e1, filtra e1==dato1, y devuelve un dato2 de forma aleatoria con la probabilidad indicada en el dict
+    def azar_basico(self,diccionario):
+        azar=random.uniform(0, 1)
+        for a in diccionario:
+            azar=azar-diccionario[a]
+            if azar<=0:
+                return a
     def distribucion_aleatoria(self,dato,diccionario):
         posibilidades=dict()
         for (dato1,dato2) in diccionario:
@@ -15,11 +21,7 @@ class MOK:
         #Rellenamos un diccionario con los posibles resultados y su respectivo valor.
         #Seleccionamos al azar teniendo en cuenta la posibilidad. Vamos a coger un numero entre 0 y 1 y vamos a ir restando
         #la posibilidad de la opcion actual. Si es <=0 entonces devolvemos el valor actual
-        azar=random.uniform(0, 1)
-        for a in posibilidades:
-            azar=azar-posibilidades[a]
-            if azar<=0:
-                return a
+        return self.azar_basico(posibilidades)
 
 
 
@@ -41,6 +43,28 @@ class MOK:
                 print ("Posibilidad de inicio nula. Poniendo a 0: "+str(a))
 
 
+
+    def muestreo(self,n):
+        if n<1:
+            print ("ERROR: muestreo recibe numero negativo")
+            return -1
+        res=list()
+        #Primer elemento
+        estado=self.azar_basico(self.posibilidades_inicio)
+        visible=self.distribucion_aleatoria(estado,self.matriz_posibilidad_observaciones)
+        res.append((estado,visible))
+        n=n-1
+        while n>0:
+            n=n-1
+            estado=self.distribucion_aleatoria(res[len(res)-1][0],self.matriz_cambios_estados)
+            visible=self.distribucion_aleatoria(estado,self.matriz_posibilidad_observaciones)
+            res.append((estado,visible))
+        return res
+
+
+
+
+
 estados=['Moneda autentica','Dos caras']#Problema de testeo rápido
 cambios={('Moneda autentica','Dos caras'):0.2,
     ('Moneda autentica','Moneda autentica'):0.8,
@@ -56,4 +80,4 @@ posibilidad_observaciones={
 
 
 modeloOculto=MOK(estados,cambios,inicial,posibilidad_observaciones)
-print(modeloOculto.distribucion_aleatoria('Dos caras',cambios))
+print(modeloOculto.muestreo(20))
