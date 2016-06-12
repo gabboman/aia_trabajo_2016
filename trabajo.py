@@ -82,8 +82,33 @@ class MOK:
                 #print (acum)
                 alfas[s]=self.matriz_posibilidad_observaciones[(s,observaciones[i])]*acum
             res.append(alfas)
+        res2=list()
+        #for x in reverse(res):
+            
         return res
 
+
+    def viterbi(self,observaciones):
+        res=list()#Usamos una lista de diccionarios
+        #Para saber del estado s3 en la observacion 4 hacemos res[4][s3]
+        maximos=dict()
+        for s in self.estados:
+            maximos[s]=self.posibilidades_inicio[s]*self.matriz_posibilidad_observaciones[(s,observaciones[0])]#Tema 4
+        res.append(maximos)
+        for i in range(1,len(observaciones)):
+            maximos=dict()#reutilizamos variables, se ha testeado y no hay problema en python3
+            for s in self.estados:
+                maximos[s]=0
+                acum=list()
+                for s2 in self.estados:
+                    #print(s+s2)
+                    #print (self.matriz_cambios_estados[(s2,s)])
+                    #print(res[i-1][s2])
+                    acum.append(self.matriz_cambios_estados[(s2,s)]*res[i-1][s2])
+                #print (acum)
+                maximos[s]=self.matriz_posibilidad_observaciones[(s,observaciones[i])]*max(acum)
+            res.append(maximos)
+        return res
 
 
 
@@ -119,4 +144,4 @@ posibilidad_observaciones={
 observaciones_ejemplo=['3','1','3','2']
 
 modeloOculto=MOK(estados,cambios,inicial,posibilidad_observaciones)
-print(modeloOculto.avance(observaciones_ejemplo))
+print(modeloOculto.viterbi(observaciones_ejemplo))
