@@ -63,8 +63,25 @@ class MOK:
 
 
     def avance(self,observaciones):
-        res=list()
-
+        res=list()#Usamos una lista de diccionarios
+        #Para saber del estado s3 en la observacion 4 hacemos res[4][s3]
+        alfas=dict()
+        for s in self.estados:
+            alfas[s]=self.posibilidades_inicio[s]*self.matriz_posibilidad_observaciones[(s,observaciones[0])]#Tema 4
+        res.append(alfas)
+        for i in range(1,len(observaciones)):
+            alfas=dict()#reutilizamos variables, se ha testeado y no hay problema en python3
+            for s in self.estados:
+                alfas[s]=0
+                acum=0
+                for s2 in self.estados:
+                    #print(s+s2)
+                    #print (self.matriz_cambios_estados[(s2,s)])
+                    #print(res[i-1][s2])
+                    acum=acum+self.matriz_cambios_estados[(s2,s)]*res[i-1][s2]
+                #print (acum)
+                alfas[s]=self.matriz_posibilidad_observaciones[(s,observaciones[i])]*acum
+            res.append(alfas)
         return res
 
 
