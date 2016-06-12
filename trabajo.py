@@ -62,22 +62,44 @@ class MOK:
         return res
 
 
+    def avance(self,observaciones):
+        res=list()
+
+        return res
 
 
 
-estados=['Moneda autentica','Dos caras']#Problema de testeo rápido
-cambios={('Moneda autentica','Dos caras'):0.2,
-    ('Moneda autentica','Moneda autentica'):0.8,
-    ('Dos caras','Moneda autentica'):0.8,
-    ('Dos caras','Dos caras'):0.2}
-inicial={'Moneda autentica':0.5,'Dos caras':0.5}
+
+
+# estados=['Moneda autentica','Dos caras']#Problema de testeo rápido
+# cambios={('Moneda autentica','Dos caras'):0.2,
+#     ('Moneda autentica','Moneda autentica'):0.8,
+#     ('Dos caras','Moneda autentica'):0.8,
+#     ('Dos caras','Dos caras'):0.2}
+# inicial={'Moneda autentica':0.5,'Dos caras':0.5}
+# posibilidad_observaciones={
+#     ('Moneda autentica','cara'):0.5,
+#     ('Moneda autentica','cruz'):0.5,
+#     ('Dos caras','cara'):1,
+#     ('Dos caras','cruz'):0}
+
+estados=['c','f']
+cambios={('c','f'):0.3,
+    ('c','c'):0.7,
+    ('f','c'):0.4,
+    ('f','f'):0.6
+    }
+inicial={'c':0.8,'f':0.2}
 posibilidad_observaciones={
-    ('Moneda autentica','cara'):0.5,
-    ('Moneda autentica','cruz'):0.5,
-    ('Dos caras','cara'):1,
-    ('Dos caras','cruz'):0}
+    ('c','1'):0.2,
+    ('c','2'):0.4,
+    ('c','3'):0.4,
+    ('f','1'):0.5,
+    ('f','2'):0.4,
+    ('f','3'):0.1,
+}
 
-
+observaciones_ejemplo=['3','1','3','2']
 
 modeloOculto=MOK(estados,cambios,inicial,posibilidad_observaciones)
-print(modeloOculto.muestreo(20))
+print(modeloOculto.avance(observaciones_ejemplo))
