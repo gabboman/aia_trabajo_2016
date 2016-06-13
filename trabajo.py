@@ -1,7 +1,8 @@
 #Trabajo de AIA por Gabriel Amador García
 import random
 import math
-
+import itertools
+import pdb
 
 class MOK:
     '''Modelo oculto de markov'''
@@ -154,5 +155,57 @@ posibilidad_observaciones={
 
 observaciones_ejemplo=['3','1','3','2']
 
-modeloOculto=MOK(estados,cambios,inicial,posibilidad_observaciones)
-print(modeloOculto.viterbi(observaciones_ejemplo))
+#modeloOculto=MOK(estados,cambios,inicial,posibilidad_observaciones)
+#print(modeloOculto.viterbi(observaciones_ejemplo))
+
+
+
+#Parte 2: ROBOT
+
+
+cuadricula_0=[
+    [0,0,1,0],
+    [1,0,1,0],
+    [0,0,0,0]
+]
+
+def mok_robot_cuadricula(cuadricula,epsilon_error):
+    #estados,cambios_estados,posibilidades_iniciales,posibilidad_observaciones
+    estados=list()
+    todas_observaciones=list()
+    todas_observaciones.append({})
+    for i in range(1,5):
+        combs=itertools.combinations({'N','S','E','O'},i)
+        for a in combs:
+            todas_observaciones.append(set(a))
+    for j in range(len(cuadricula)):
+        for i in range(len(cuadricula[j])):
+            if(cuadricula[j][i] == 0):
+                estados.append((i,j))
+    posibilidades_iniciales=dict()
+    cambios_estados=dict()
+    posibilidad_observaciones=dict()
+    #Las observaciones serán varios posibles conjuntos, con todas las posibilidades de obstaculos (4! como mucho)
+    for e in estados:
+        posibilidades_iniciales[e]=1.0/len(estados)
+        #Por simplificar, inicializaremos todas las posibilidades a 0
+        for j in estados:#no soy muy imaginativo con los nombres de las variables
+            cambios_estados[(e,j)]=0.0
+        obstaculos=set({'N','S','E','O'})
+        for obs in todas_observaciones:
+            posibilidad_observaciones[(e,frozenset(obs))]=epsilon_error/15#16 posibilidades en total
+
+        if((e[0],e[1]-1) in estados):#Podemos ir al norte
+            obstaculos.remove('N')
+        if((e[0],e[1]+1) in estados):#Podemos ir al sur
+            obstaculos.remove('S')
+        if((e[0]+1,e[1]) in estados):#Podemos ir al este
+            obstaculos.remove('E')
+        if((e[0]-1,e[1]) in estados):#Podemos ir al oeste
+            obstaculos.remove('O')
+        diff_obstaculos={'N','S','E','O'}.difference(obstaculos)#Lo usamos para el error
+        #En caso de que los sensores fallen, POSIBILIDAD AL AZAR!
+        posibilidad_observaciones[(e,frozenset(obstaculos))]=1-epsilon_error
+    print(posibilidad_observaciones)
+
+mok_robot_cuadricula(cuadricula_0,0.1)
