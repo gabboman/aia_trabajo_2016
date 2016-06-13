@@ -232,6 +232,17 @@ def mok_robot_cuadricula(cuadricula,epsilon_error):
     #print(cambios_estados)
     return(MOK(estados,cambios_estados,posibilidades_iniciales,posibilidad_observaciones))
 
-prueba_robot=mok_robot_cuadricula(cuadricula_ejemplo,0.1)
+prueba_robot=mok_robot_cuadricula(cuadricula_ejemplo,0.001)
 
-print(prueba_robot.muestreo(5))
+#print(prueba_robot.muestreo(5))
+
+observaciones_robot=[frozenset({'S'}), frozenset({'N'}), frozenset({'O'}), frozenset({'S'}), frozenset({'S'})]
+
+print("Estado final más probable")
+pos=prueba_robot.avance(observaciones_robot)
+pos=pos[len(pos)-1]
+print(max(pos, key=pos.get))
+print("Posibilidad del estado final:")
+print(pos[max(pos, key=pos.get)])
+print("Secuencia más probable")
+print(prueba_robot.viterbi(observaciones_robot))
