@@ -172,6 +172,13 @@ cuadricula_0=[
     [0,0,0,0]
 ]
 
+cuadricula_ejemplo=[
+    [0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0],#En caso de empezar en (15,0) el programa daría NONE
+    [1,1,0,0,1,0,1,1,0,1,0,1,0,1,1,1],
+    [1,0,0,0,1,0,1,1,0,0,0,0,0,1,1,0],
+    [0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0]
+]
+
 def mok_robot_cuadricula(cuadricula,epsilon_error):
     #estados,cambios_estados,posibilidades_iniciales,posibilidad_observaciones
     estados=list()
@@ -206,7 +213,10 @@ def mok_robot_cuadricula(cuadricula,epsilon_error):
             obstaculos.remove('E')
         if((e[0]-1,e[1]) in estados):#Podemos ir al oeste
             obstaculos.remove('O')
-        posibilidad_movimiento=1.0/len(obstaculos)
+        if(len(obstaculos)!=4):
+            posibilidad_movimiento=1.0/(4-len(obstaculos))
+        else:
+            posibilidad_movimiento=0.0
 
         if((e[0],e[1]-1) in estados):#Podemos ir al norte
             cambios_estados[(e,(e[0],e[1]-1))]=posibilidad_movimiento
@@ -222,6 +232,6 @@ def mok_robot_cuadricula(cuadricula,epsilon_error):
     #print(cambios_estados)
     return(MOK(estados,cambios_estados,posibilidades_iniciales,posibilidad_observaciones))
 
-prueba_robot=mok_robot_cuadricula(cuadricula_0,0.1)
+prueba_robot=mok_robot_cuadricula(cuadricula_ejemplo,0.1)
 
-print(prueba_robot.muestreo(10))
+print(prueba_robot.muestreo(5))
