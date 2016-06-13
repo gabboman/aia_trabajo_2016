@@ -10,10 +10,13 @@ class MOK:
     #con entrada e1, filtra e1==dato1, y devuelve un dato2 de forma aleatoria con la probabilidad indicada en el dict
     def azar_basico(self,diccionario):
         azar=random.uniform(0, 1)
+        res=None
         for a in diccionario:
+            res=a
             azar=azar-diccionario[a]
             if azar<=0:
                 return a
+        return res
     def distribucion_aleatoria(self,dato,diccionario):
         posibilidades=dict()
         for (dato1,dato2) in diccionario:
@@ -203,9 +206,22 @@ def mok_robot_cuadricula(cuadricula,epsilon_error):
             obstaculos.remove('E')
         if((e[0]-1,e[1]) in estados):#Podemos ir al oeste
             obstaculos.remove('O')
-        diff_obstaculos={'N','S','E','O'}.difference(obstaculos)#Lo usamos para el error
+        posibilidad_movimiento=1.0/len(obstaculos)
+
+        if((e[0],e[1]-1) in estados):#Podemos ir al norte
+            cambios_estados[(e,(e[0],e[1]-1))]=posibilidad_movimiento
+        if((e[0],e[1]+1) in estados):#Podemos ir al sur
+            cambios_estados[(e,(e[0],e[1]+1))]=posibilidad_movimiento
+        if((e[0]+1,e[1]) in estados):#Podemos ir al este
+            cambios_estados[(e,(e[0]+1,e[1]))]=posibilidad_movimiento
+        if((e[0]-1,e[1]) in estados):#Podemos ir al oeste
+            cambios_estados[(e,(e[0]-1,e[1]))]=posibilidad_movimiento
+
         #En caso de que los sensores fallen, POSIBILIDAD AL AZAR!
         posibilidad_observaciones[(e,frozenset(obstaculos))]=1-epsilon_error
-    print(posibilidad_observaciones)
+    #print(cambios_estados)
+    return(MOK(estados,cambios_estados,posibilidades_iniciales,posibilidad_observaciones))
 
-mok_robot_cuadricula(cuadricula_0,0.1)
+prueba_robot=mok_robot_cuadricula(cuadricula_0,0.1)
+
+print(prueba_robot.muestreo(10))
