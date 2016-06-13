@@ -283,48 +283,52 @@ def rendimiento_virterbi(autentico,descifrado):
 #Test del robot según la distancia y el error epsilon:
 
 numeroRepeticiones=10
-rangoError=10
+#rangoError=5
+error=0.005
 distancia_recorrido=40
+obst=16
+tam_x=8
+tam_y=8
 diccionarioAvance=dict()#Usaremos estos diccionarios para guardar datos
 diccionarioViterbi=dict()#de como de buenas son las aprox. generadas
 #Solo calcularemos la media
 
-for error in range(0,rangoError):#Error máximo 0.5
-    epsilon=0.01*error
-    print("##############EPSILON: "+str(epsilon)+" ####################")
-    mok_error=mok_robot_cuadricula(cuadricula_ejemplo,epsilon)
-    for distancia in range(1,distancia_recorrido+1):
-        media_viterbi=0
-        media_avance=0
-        for repeticiones in range(1,numeroRepeticiones+1):
-            hechosYObservaciones=mok_error.muestreo(distancia)#En cada iteracion generamos un camino nuevo
-            observaciones=list()
-            hechos=list()#Juraria que hay otra variable llamada estados por ahi
+#for error in range(0,rangoError):#Error máximo 0.5
+epsilon=error
+print("##############EPSILON: "+str(epsilon)+" ####################")
+mok_error=mok_robot_cuadricula(genera_cuadricula(tam_x,tam_y,obst),epsilon)
+for distancia in range(1,distancia_recorrido+1):
+    media_viterbi=0
+    media_avance=0
+    for repeticiones in range(1,numeroRepeticiones+1):
+        hechosYObservaciones=mok_error.muestreo(distancia)#En cada iteracion generamos un camino nuevo
+        observaciones=list()
+        hechos=list()#Juraria que hay otra variable llamada estados por ahi
 
-            for (a,b) in hechosYObservaciones:
-                hechos.append(a)
-                observaciones.append(b)
-            viterbi=mok_error.viterbi(observaciones)
-            media_viterbi+=rendimiento_virterbi(hechos,viterbi)
-            avan=mok_error.avance(observaciones)
-            finAvance=max(avan[len(avan)-1], key=avan[len(avan)-1].get)
-            media_avance+=distancia_manhattan(finAvance,hechos[len(hechos)-1])
-        media_viterbi=media_viterbi*1.0/numeroRepeticiones
-        media_avance=media_avance*1.0/numeroRepeticiones
-        diccionarioViterbi[(distancia,epsilon)]=media_viterbi
-        diccionarioAvance[(distancia,epsilon)]=media_avance
-        print("###DISTANCIA RECORRIDA: "+str(distancia))
-        #print(diccionarioViterbi)
+        for (a,b) in hechosYObservaciones:
+            hechos.append(a)
+            observaciones.append(b)
+        viterbi=mok_error.viterbi(observaciones)
+        media_viterbi+=rendimiento_virterbi(hechos,viterbi)
+        avan=mok_error.avance(observaciones)
+        finAvance=max(avan[len(avan)-1], key=avan[len(avan)-1].get)
+        media_avance+=distancia_manhattan(finAvance,hechos[len(hechos)-1])
+    media_viterbi=media_viterbi*1.0/numeroRepeticiones
+    media_avance=media_avance*1.0/numeroRepeticiones
+    diccionarioViterbi[distancia]=media_viterbi/distancia
+    diccionarioAvance[distancia]=media_avance
+    print("###DISTANCIA RECORRIDA: "+str(distancia))
+    #print(diccionarioViterbi)
 print("###################RESULTADO FINAL#####################")
 print("EXACTITUD VITERBI VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON. Más mejor")
 print(diccionarioViterbi)
 print("EXACTITUD AVANCE VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON. Menos es mejor")
 print(diccionarioAvance)
 
-archivo=open('salida_avance.json','w')
-json_data = json.dump(diccionarioAvance,archivo, sort_keys=True, indent=4)
-archivo.close()
-archivo=open('salida_viterbi.json','w')
-json_data = json.dump(diccionarioViterbi,archivo, sort_keys=True, indent=4)
-archivo.close()
-print("Se ha generado un archivo json con el nombre salida_avance.json y salida_viterbi.json")
+# archivo=open('salida_avance.json','w')
+# json_data = json.dump(diccionarioAvance,archivo, sort_keys=True, indent=4)
+# archivo.close()
+# archivo=open('salida_viterbi.json','w')
+# json_data = json.dump(diccionarioViterbi,archivo, sort_keys=True, indent=4)
+# archivo.close()
+# print("Se ha generado un archivo json con el nombre salida_avance.json y salida_viterbi.json")
