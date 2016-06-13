@@ -84,30 +84,41 @@ class MOK:
             res.append(alfas)
         res2=list()
         #for x in reverse(res):
-            
+
         return res
 
 
     def viterbi(self,observaciones):
-        res=list()#Usamos una lista de diccionarios
-        #Para saber del estado s3 en la observacion 4 hacemos res[4][s3]
-        maximos=dict()
+        construccion=list()
+        vk=dict()
+        prk=dict()
         for s in self.estados:
-            maximos[s]=self.posibilidades_inicio[s]*self.matriz_posibilidad_observaciones[(s,observaciones[0])]#Tema 4
-        res.append(maximos)
+            vk[s]=self.posibilidades_inicio[s]*self.matriz_posibilidad_observaciones[(s,observaciones[0])]
+            prk[s]=None
+
+            #Tema 4
+        construccion.append((vk,prk))
         for i in range(1,len(observaciones)):
-            maximos=dict()#reutilizamos variables, se ha testeado y no hay problema en python3
+            vk=dict()
+            prk=dict()
             for s in self.estados:
-                maximos[s]=0
+                prkMax=dict()
                 acum=list()
                 for s2 in self.estados:
-                    #print(s+s2)
-                    #print (self.matriz_cambios_estados[(s2,s)])
-                    #print(res[i-1][s2])
-                    acum.append(self.matriz_cambios_estados[(s2,s)]*res[i-1][s2])
-                #print (acum)
-                maximos[s]=self.matriz_posibilidad_observaciones[(s,observaciones[i])]*max(acum)
-            res.append(maximos)
+                    acum.append(self.matriz_cambios_estados[(s2,s)]*construccion[i-1][0][s2])
+                    prkMax[s2]=self.matriz_cambios_estados[(s2,s)]*construccion[i-1][0][s2]
+                prk[s]=max(prkMax, key=prkMax.get)
+                #print(prk)
+                vk[s]=self.matriz_posibilidad_observaciones[(s,observaciones[i])]*max(acum)
+            construccion.append((vk,prk))
+
+        #Reconstrucción:
+        #Seleccionamos la mayor probabilidad en s4:
+        ProbabilidadFinal=construccion[len(construccion)-1][0]
+        res=list()
+        res.append(max(ProbabilidadFinal, key=ProbabilidadFinal.get))
+        for i in range(len(construccion)-1,0,-1):
+            res.append(construccion[i][1][res[len(res)-1]])
         return res
 
 
