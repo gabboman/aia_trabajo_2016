@@ -234,7 +234,7 @@ def mok_robot_cuadricula(cuadricula,epsilon_error):
 
 prueba_robot=mok_robot_cuadricula(cuadricula_ejemplo,0.001)
 
-#print(prueba_robot.muestreo(5))
+
 
 observaciones_robot=[frozenset({'S'}), frozenset({'N'}), frozenset({'O'}), frozenset({'S'}), frozenset({'S'})]
 
@@ -246,3 +246,58 @@ print("Posibilidad del estado final:")
 print(pos[max(pos, key=pos.get)])
 print("Secuencia más probable")
 print(prueba_robot.viterbi(observaciones_robot))
+
+
+
+#Parte 3:
+#Utilidades:
+def distancia_manhattan(x,y):
+    return abs(x[0]-y[0])+abs(x[1]-y[1])
+
+def rendimiento_virterbi(autentico,descifrado):
+    acum=0
+    for i in range(len(descifrado)):
+        if(autentico[i]==descifrado[i]):
+            acum=acum+1
+    return acum
+#Parámetros que vamos a probar:
+
+#Test del robot según la distancia y el error epsilon:
+
+numeroRepeticiones=10
+rangoError=10
+distancia_recorrido=40
+diccionarioAvance=dict()#Usaremos estos diccionarios para guardar datos
+diccionarioViterbi=dict()#de como de buenas son las aprox. generadas
+#Solo calcularemos la media
+
+for error in range(0,rangoError):#Error máximo 0.5
+    epsilon=0.01*error
+    print("##############EPSILON: "+str(epsilon)+" ####################")
+    mok_error=mok_robot_cuadricula(cuadricula_ejemplo,epsilon)
+    for distancia in range(1,distancia_recorrido+1):
+        media_viterbi=0
+        media_avance=0
+        for repeticiones in range(1,numeroRepeticiones+1):
+            hechosYObservaciones=mok_error.muestreo(distancia)#En cada iteracion generamos un camino nuevo
+            observaciones=list()
+            hechos=list()#Juraria que hay otra variable llamada estados por ahi
+
+            for (a,b) in hechosYObservaciones:
+                hechos.append(a)
+                observaciones.append(b)
+            viterbi=mok_error.viterbi(observaciones)
+            media_viterbi+=rendimiento_virterbi(hechos,viterbi)
+            avan=mok_error.avance(observaciones)
+            finAvance=max(avan[len(avan)-1], key=avan[len(avan)-1].get)
+            media_avance+=distancia_manhattan(finAvance,hechos[len(hechos)-1])
+        media_viterbi=media_viterbi*1.0/numeroRepeticiones
+        media_avance=media_avance*1.0/numeroRepeticiones
+        diccionarioViterbi[(distancia,epsilon)]=media_viterbi
+        diccionarioAvance[(distancia,epsilon)]=media_avance
+        #print(diccionarioViterbi)
+print("###################RESULTADO FINAL#####################")
+print("EXACTITUD VITERBI VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON:")
+print(diccionarioViterbi)
+print("EXACTITUD AVANCE VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON:")
+print(diccionarioAvance)
