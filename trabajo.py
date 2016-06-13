@@ -180,6 +180,23 @@ cuadricula_ejemplo=[
     [0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0]
 ]
 
+def genera_cuadricula(x,y,obstaculos):
+    pos_obstaculos=set()
+    while len(pos_obstaculos)<obstaculos:
+        pos_x = random.randint(0,x-1)
+        pos_y = random.randint(0,y-1)
+        pos_obstaculos.add((pos_x,pos_y))
+    print(pos_obstaculos)
+    res=list()
+    for fila in range(y):
+        res.append([0]*x)
+    for obstaculo in pos_obstaculos:
+        res[obstaculo[0]][obstaculo[1]]=1
+    return res
+
+
+
+
 def mok_robot_cuadricula(cuadricula,epsilon_error):
     #estados,cambios_estados,posibilidades_iniciales,posibilidad_observaciones
     estados=list()
