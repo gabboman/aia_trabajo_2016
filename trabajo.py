@@ -2,6 +2,7 @@
 import random
 import math
 import itertools
+import json
 import pdb
 
 class MOK:
@@ -295,9 +296,18 @@ for error in range(0,rangoError):#Error máximo 0.5
         media_avance=media_avance*1.0/numeroRepeticiones
         diccionarioViterbi[(distancia,epsilon)]=media_viterbi
         diccionarioAvance[(distancia,epsilon)]=media_avance
+        print("###DISTANCIA RECORRIDA: "+str(distancia))
         #print(diccionarioViterbi)
 print("###################RESULTADO FINAL#####################")
-print("EXACTITUD VITERBI VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON:")
+print("EXACTITUD VITERBI VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON. Más mejor")
 print(diccionarioViterbi)
-print("EXACTITUD AVANCE VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON:")
+print("EXACTITUD AVANCE VARIANDO LA DISTANCIA RECORRIDA Y EL ERROR EPSILON. Menos es mejor")
 print(diccionarioAvance)
+
+archivo=open('salida_avance.json','w')
+json_data = json.dump(diccionarioAvance,archivo, sort_keys=True, indent=4)
+archivo.close()
+archivo=open('salida_viterbi.json','w')
+json_data = json.dump(diccionarioViterbi,archivo, sort_keys=True, indent=4)
+archivo.close()
+print("Se ha generado un archivo json con el nombre salida_avance.json y salida_viterbi.json")
